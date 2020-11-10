@@ -13,6 +13,8 @@ var margin = { top: 10, right: 30, bottom: 30, left: 60 },
     width = 660 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
+var legendWidth = width - 100;
+
 // append the svg object to the body of the page
 var svg = d3
     .select("#root")
@@ -21,6 +23,33 @@ var svg = d3
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.select("#root")
+    .append("div")
+    .attr("id", "legend")
+
+svg.append("circle")
+    .attr("cx", legendWidth)
+    .attr("cy", 30)
+    .attr("r", 6)
+    .style("fill", "#dd9866");
+svg.append("circle")
+    .attr("cx", legendWidth)
+    .attr("cy", 50)
+    .attr("r", 6)
+    .style("fill", "#69b3a2");
+svg.append("text")
+    .attr("x", legendWidth + 10)
+    .attr("y", 30)
+    .text("Free from Doping")
+    .style("font-size", "15px")
+    .attr("alignment-baseline", "middle");
+svg.append("text")
+    .attr("x", legendWidth + 10)
+    .attr("y", 50)
+    .text("Caught in Doping")
+    .style("font-size", "15px")
+    .attr("alignment-baseline", "middle");
 
 d3.json(source).then((data) => {
     // Add X axis
@@ -41,11 +70,10 @@ d3.json(source).then((data) => {
     var from = new Date("1995-01-01 00:36:45");
     var to = new Date("1995-01-01 00:40:00");
 
-    var y = d3.scaleTime().domain([from, to]).range([height, 0]);
+    var y = d3.scaleTime().domain([to, from]).range([height, 0]);
 
     var y_axis = d3.axisLeft(y).tickFormat((d) => {
         let t = d.toTimeString().replace(/.*:(\d{2}:\d{2}).*/, "$1");
-        console.log(t);
         return t;
     });
 
@@ -72,8 +100,8 @@ d3.json(source).then((data) => {
         .attr("r", 3)
         .style("fill", (d) => {
             if (d["Doping"] === "") {
-                return "dd9866"
+                return "#dd9866";
             }
-            return "#69b3a2"
+            return "#69b3a2";
         });
 });
