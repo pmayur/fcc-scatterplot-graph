@@ -24,9 +24,7 @@ var svg = d3
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.select("#root")
-    .append("div")
-    .attr("id", "legend")
+d3.select("#root").append("div").attr("id", "legend");
 
 svg.append("circle")
     .attr("cx", legendWidth)
@@ -77,6 +75,12 @@ d3.json(source).then((data) => {
         return t;
     });
 
+    var tooltip = d3
+        .select("#root")
+        .append("div")
+        .attr("id", "tooltip")
+        .style("opacity", 0);
+
     svg.append("g").attr("id", "y-axis").call(y_axis);
 
     svg.append("g")
@@ -97,11 +101,32 @@ d3.json(source).then((data) => {
         .attr("cy", (d) => {
             return y(new Date("1995-01-01 00:" + d["Time"]));
         })
-        .attr("r", 3)
+        .attr("r", 5)
         .style("fill", (d) => {
             if (d["Doping"] === "") {
                 return "#dd9866";
             }
             return "#69b3a2";
+        })
+        .on("mouseover", function (d) {
+            let raceRanYear = new Date(d.srcElement.getAttribute("data-xvalue")).getFullYear()
+            let timeTaken = new Date(d.srcElement.getAttribute("data-yvalue")).toTimeString().replace(/.*:(\d{2}:\d{2}).*/, "$1");
+
+            tooltip.transition().duration(200).style("opacity", 0.9);
+            tooltip.attr("data-year", d.srcElement.getAttribute("data-xvalue"));
+            tooltip.attr("data-date", d.srcElement.getAttribute("data-yvalue"));
+            tooltip
+                .html(
+                    "Race ran in: " 
+                    + raceRanYear
+                    + "<br/>"
+                    + "Time taken (minutes):"
+                    + timeTaken
+                )
+                .style("left", d.pageX + "px")
+                .style("top", d.pageY - 28 + "px");
+        })
+        .on("mouseout", function (d) {
+            tooltip.transition().duration(500).style("opacity", 0);
         });
 });
