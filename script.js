@@ -98,6 +98,9 @@ d3.json(source).then((data) => {
         .attr("data-yvalue", (d) => {
             return new Date("1995-01-01 00:" + d["Time"]);
         })
+        .attr("racer-name", (d) => {
+            return d["Name"];
+        })
         .attr("cy", (d) => {
             return y(new Date("1995-01-01 00:" + d["Time"]));
         })
@@ -109,19 +112,26 @@ d3.json(source).then((data) => {
             return "#69b3a2";
         })
         .on("mouseover", function (d) {
-            let raceRanYear = new Date(d.srcElement.getAttribute("data-xvalue")).getFullYear()
-            let timeTaken = new Date(d.srcElement.getAttribute("data-yvalue")).toTimeString().replace(/.*:(\d{2}:\d{2}).*/, "$1");
+            let racerName = d.srcElement.getAttribute("racer-name");
+            let raceRanYear = new Date(
+                d.srcElement.getAttribute("data-xvalue")
+            ).getFullYear();
+            let timeTaken = new Date(d.srcElement.getAttribute("data-yvalue"))
+                .toTimeString()
+                .replace(/.*:(\d{2}:\d{2}).*/, "$1");
 
             tooltip.transition().duration(200).style("opacity", 0.9);
             tooltip.attr("data-year", d.srcElement.getAttribute("data-xvalue"));
             tooltip.attr("data-date", d.srcElement.getAttribute("data-yvalue"));
             tooltip
                 .html(
-                    "Race ran in: " 
-                    + raceRanYear
-                    + "<br/>"
-                    + "Time taken (minutes):"
-                    + timeTaken
+                    racerName +
+                        "<br/>" +
+                        "Race ran in: " +
+                        raceRanYear +
+                        "<br/>" +
+                        "Time taken (minutes):" +
+                        timeTaken
                 )
                 .style("left", d.pageX + "px")
                 .style("top", d.pageY - 28 + "px");
