@@ -30,6 +30,7 @@ d3.json(source).then((data) => {
         .range([0, width]);
 
     svg.append("g")
+        .attr("id", "x-axis")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x));
 
@@ -37,35 +38,42 @@ d3.json(source).then((data) => {
 
     var timeParser = d3.timeParse("%M:%S");
 
-    var from = new Date("1995-01-01 00:36:30");
+    var from = new Date("1995-01-01 00:36:45");
     var to = new Date("1995-01-01 00:40:00");
 
-    var y = d3
-        .scaleTime()
-        .domain([from, to])
-        .range([height, 0]);
+    var y = d3.scaleTime().domain([from, to]).range([height, 0]);
 
-    var y_axis = d3
-        .axisLeft(y)
-        .tickFormat((d) => {
-            let t = d.toTimeString().replace(/.*:(\d{2}:\d{2}).*/, "$1");
-            console.log(t)
-            return t
-        });
+    var y_axis = d3.axisLeft(y).tickFormat((d) => {
+        let t = d.toTimeString().replace(/.*:(\d{2}:\d{2}).*/, "$1");
+        console.log(t);
+        return t;
+    });
 
-    svg.append("g").call(y_axis);
+    svg.append("g").attr("id", "y-axis").call(y_axis);
 
     svg.append("g")
         .selectAll("dot")
         .data(data)
         .enter()
         .append("circle")
-        .attr("cx", (d) => { 
-            return x(new Date(d["Year"]+"-01-01")); 
+        .attr("class", "dot")
+        .attr("data-xvalue", (d) => {
+            return new Date(d["Year"] + "-01-01");
         })
-        .attr("cy", (d) => { 
-            return y(new Date("1995-01-01 00:"+d["Time"])); 
+        .attr("cx", (d) => {
+            return x(new Date(d["Year"] + "-01-01"));
+        })
+        .attr("data-yvalue", (d) => {
+            return new Date("1995-01-01 00:" + d["Time"]);
+        })
+        .attr("cy", (d) => {
+            return y(new Date("1995-01-01 00:" + d["Time"]));
         })
         .attr("r", 3)
-        .style("fill", "#69b3a2");
+        .style("fill", (d) => {
+            if (d["Doping"] === "") {
+                return "dd9866"
+            }
+            return "#69b3a2"
+        });
 });
